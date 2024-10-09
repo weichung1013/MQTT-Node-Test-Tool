@@ -1,5 +1,5 @@
 **/node_modules
-*.pem
-*.pem.crt
-*.pem.key
+**.pem
+**.pem.crt
+**.pem.key
 .env
