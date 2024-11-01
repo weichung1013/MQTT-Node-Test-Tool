@@ -4,6 +4,8 @@ require("dotenv").config();
 
 const env = process.env;
 
+const vehicleSn = "FDC123456789012345678901234567";
+
 let options = {
   port: env.MQTT_BROKER_PORT,
   username: env.MQTT_BROKER_USERNAME,
@@ -14,33 +16,17 @@ let options = {
   timeout: 10,
 };
 
-// const client = mqtt.connect("mqtt://52.69.26.8");
 const client = mqtt.connect("mqtts://" + env.MQTT_BROKER_HOST, options);
 
 client.on("connect", function () {
   console.log("connected");
 
-  client.subscribe("FDC123456789012345678901234567", (err) => {
+  client.subscribe(vehicleSn, (err) => {
     if (!err) {
       console.log("subscribed");
-      setInterval(() => {
-        // randomly set cmd as lock or unlock
-        const isToLock = Math.random() > 0.5 ? true : false;
-        const message = {
-          // timestamp: "20240905T053030Z",
-          timestamp: new Date().toISOString(),
-          vehicleId: "FDC123456789012345678901234567",
-          action: "doorLock",
-          data: {
-            cmd: isToLock ? "doorLock" : "doorUnlock",
-          },
-        };
-
-        client.publish(
-          "FDC123456789012345678901234567/conn/remote-control/sreq/door-lock-unlock/v0",
-          JSON.stringify(message)
-        );
-      }, 10000);
+      // setInterval(() => {
+      //   sendDoorLockCmd(client);
+      // }, 10000);
     }
   });
 });
@@ -54,3 +40,22 @@ client.on("message", function (topic, message) {
   console.log(message.toString());
   //   client.end();
 });
+
+const sendDoorLockCmd = (client) => {
+  // randomly set cmd as lock or unlock
+  const isToLock = Math.random() > 0.5 ? true : false;
+  const message = {
+    // timestamp: "20240905T053030Z",
+    timestamp: new Date().toISOString(),
+    vehicleId: vehicleSn,
+    action: "doorLock",
+    data: {
+      cmd: isToLock ? "doorLock" : "doorUnlock",
+    },
+  };
+
+  client.publish(
+    vehicleSn + "/conn/remote-control/sreq/door-lock-unlock/v0",
+    JSON.stringify(message)
+  );
+};
