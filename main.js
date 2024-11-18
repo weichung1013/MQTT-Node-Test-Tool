@@ -24,9 +24,9 @@ client.on("connect", function () {
   client.subscribe(vehicleSn, (err) => {
     if (!err) {
       console.log("subscribed");
-      // setInterval(() => {
-      //   sendDoorLockCmd(client);
-      // }, 10000);
+      setInterval(() => {
+        sendDoorLockCmd(client);
+      }, 10000);
     }
   });
 });
@@ -48,14 +48,19 @@ const sendDoorLockCmd = (client) => {
     // timestamp: "20240905T053030Z",
     timestamp: new Date().toISOString(),
     vehicleId: vehicleSn,
-    action: "doorLock",
+    // action: "doorLockUnlock",
+    action: "doorLockUnlockAck",
+    // data: {
+    //   cmd: isToLock ? "doorLock" : "doorUnlock",
+    // },
     data: {
-      cmd: isToLock ? "doorLock" : "doorUnlock",
+      ack: "success",
     },
   };
 
   client.publish(
-    vehicleSn + "/conn/remote-control/sreq/door-lock-unlock/v0",
+    // vehicleSn + "/conn/remote-control/sreq/door-lock-unlock/v0",
+    vehicleSn + "/conn/remote-control/vres/door-lock-unlock-ack/v0",
     JSON.stringify(message)
   );
 };
